@@ -1,0 +1,115 @@
+esphome:
+  name: hydroponics
+  platform: esp32
+  board: esp32dev
+
+wifi:
+  ssid: "dein_wifi_name"
+  password: "dein_wifi_passwort"
+
+  ap:
+    ssid: "Hydroponics Fallback Hotspot"
+    password: "fallback_passwort"
+
+captive_portal:
+
+logger:
+
+api:
+
+ota:
+  platform: esphome  # OTA-Originalfunktion hinzufügen
+
+# Konfiguration für den pH-Wert-Sensor
+sensor:
+  - platform: adc
+    pin: GPIO35
+    name: "pH-Wert"
+    id: ph_wert
+    unit_of_measurement: "pH"
+    accuracy_decimals: 2
+    update_interval: 10s
+    filters:
+      - calibrate_linear:
+          - 0.0 -> 0.0
+          - 3.3 -> 14.0
+
+  # Konfiguration für den EC-Sensor (elektrische Leitfähigkeit)
+  - platform: adc
+    pin: GPIO34
+    name: "EC-Wert"
+    id: ec_wert
+    unit_of_measurement: "µS/cm"
+    accuracy_decimals: 2
+    update_interval: 10s
+    filters:
+      - calibrate_linear:
+          - 0.0 -> 0.0
+          - 3.3 -> 2000.0
+
+  # Konfiguration für den Bodenfeuchtigkeitssensor als Füllstandsanzeige
+  - platform: adc
+    pin: GPIO33
+    name: "Nährstoffreservoir Füllstand"
+    id: reservoir_fuellstand
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    update_interval: 10s
+    filters:
+      - calibrate_linear:
+          - 0.0 -> 0.0   # Trocken
+          - 3.3 -> 100.0  # Voll
+    icon: "mdi:water-percent"
+
+# Binary Sensoren für Füllstandsanzeige und Alarme
+binary_sensor:
+  - platform: template
+    name: "Nährstoffreservoir Voll"
+    id: reservoir_voll
+    lambda: |-
+      if (id(reservoir_fuellstand).state > 20) {  // Schwelle für "Voll"
+        return true;
+      } else {
+        return false;
+      }
+    device_class: moisture
+
+  - platform: template
+    name: "Nährstoffreservoir Achtung Bals Leer"
+    id: reservoir_leer
+    lambda: |-
+      if (id(reservoir_fuellstand).state < 10) {  // Schwelle für "Fast Leer"
+        return true;
+      } else {
+    <!DOCTYPE html>
+<html>
+<head>
+  <title>Meshy.ai API Integration</title>
+</head>
+<body>
+  <h1>Generate 3D Model with Meshy.ai</h1>
+  <button onclick="callMeshyAPI()">Generate Model</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function callMeshyAPI() {
+      const apiKey = "msy_dX1BP44e2BBjXo91NPzftJnU75Wdz0DY6vcg";
+      const response = await fetch("https://api.meshy.ai/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          prompt: "Create a 3D low-poly bunny with 'Happy New Year 2025'.",
+          format: "stl"
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
+
